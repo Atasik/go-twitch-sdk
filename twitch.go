@@ -29,9 +29,6 @@ const (
 	endpointUsers         = "/users"
 	endpointSubscriptions = "/eventsub/subscriptions"
 
-	// xErrorHeader used to parse error message from Headers on non-2XX responses
-	xErrorHeader = "X-Error"
-
 	defaultTimeout = 5 * time.Second
 )
 
@@ -142,7 +139,7 @@ func (c *Client) Subscribe(ctx context.Context, typ, id, callback, secret, acces
 }
 
 // DeleteSubscriptions is used to delete subscription
-func (c *Client) DeleteSubscription(ctx context.Context, id, inp input.UserInput, accessToken string) error {
+func (c *Client) DeleteSubscription(ctx context.Context, inp input.UserInput, accessToken string) error {
 	if _, err := c.doHTTP(ctx, inp, nil, endpointSubscriptions, accessToken, http.MethodDelete); err != nil {
 		return err
 	}
@@ -185,8 +182,8 @@ func (c *Client) responseHandler(req *http.Request) (string, error) {
 
 	defer resp.Body.Close()
 
-	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusAccepted {
-		err := fmt.Sprintf("API Error: %s", resp.Header.Get(xErrorHeader))
+	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusAccepted && resp.StatusCode != http.StatusNoContent {
+		err := fmt.Sprintf("API Error: %d", resp.StatusCode)
 		return "", errors.New(err)
 	}
 
