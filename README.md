@@ -1,3 +1,5 @@
+Пример использования:
+
 ```
 package main
 
@@ -12,17 +14,20 @@ import (
 func main() {
 	ctx := context.Background()
 
+	//Создаю новый клиент
 	client, err := twitch.NewClient(<client-id>, <client-secret>)
 	if err != nil {
 		log.Fatalf("Failed to create client: %s", err.Error())
 	}
 
+	//Получаю url для авторизации
 	url, err := client.GetAuthorizationURL(<redirect-url>)
 	if err != nil {
 		log.Fatalf("Failed to get authorization  url: %s", err.Error())
 	}
 	fmt.Println(url)
 
+	//Получаю access token
 	authResp, err := client.GetAccessToken(ctx)
 
 	if err != nil {
@@ -30,7 +35,7 @@ func main() {
 	}
 
 	fmt.Println(authResp.AccessToken)
-
+	
 	userResp, err := client.GetUser(ctx, twitch.UserRequest{
 		UserLogin: "xqc",
 	}, *authResp)
